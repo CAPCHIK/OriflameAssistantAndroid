@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Oriflame Assistant</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--<string name="title_activity_order_list">OrderListActivity</string>-->
+    <string name="customer">Заказчик</string>
+    <string name="action_to_products">Список продуктов</string>
+    <string name="addText">Сформировать заказ</string>
+    <string name="products_in_order">Товары в заказе</string>
+    <string name="add_product">Добавить товар</string>
+    <string name="date">Дата добавления</string>
+    <string name="order_price">Общая стоимость заказа</string>
+    <string name="remove_from_list">Удалить из списка</string>
+    <string name="details">Подробнее</string>
+</resources>
