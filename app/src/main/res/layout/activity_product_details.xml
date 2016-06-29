@@ -63,7 +63,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="0000002"
-                    android:id="@+id/product_price" />
+                    android:id="@+id/product_price"/>
 
             </LinearLayout>
 
