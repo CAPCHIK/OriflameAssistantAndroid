@@ -1,19 +1,15 @@
 package ru.cap.oriflameassistant;
 
+import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -49,7 +45,9 @@ public class OrderInfo extends AppCompatActivity {
         dbHelper = new DataBaseHelper(getApplicationContext());
         productsList.setAdapter(productsAdapter);
 
-        new LoadOrder().execute(getIntent().getLongExtra(Order.ColumnInfo.ID.getName(), 1));
+        long orderId = getIntent().getLongExtra(Order.ColumnInfo.ID.getName(), 1);
+        setTitle("Заказ №" + orderId);
+        new LoadOrder().execute(orderId);
 
         productsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -65,11 +63,12 @@ public class OrderInfo extends AppCompatActivity {
                                 productsAdapter.remove(position);
                                 break;
                             case R.id.details_product:
-                                Toast.makeText(getApplicationContext(), "Не реализовано", Toast.LENGTH_LONG)
-                                        .show();
-                                break;
+                                Intent intent = new Intent(OrderInfo.this, ProductDetails.class);
+                                intent.putExtra(Product.TABLE_NAME, productsAdapter.getProduct(position - productsList.getHeaderViewsCount()).getOriflameId());
+                                startActivity(intent);
+                                return true;
                         }
-                        return true;
+                        return false;
                     }
                 });
                 menu.show();

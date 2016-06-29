@@ -43,7 +43,7 @@ public class NewOrderActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        customerChooser.setAdapter(new ArrayAdapter<String>(getApplicationContext(),
+        customerChooser.setAdapter(new ArrayAdapter<>(getApplicationContext(),
                 R.layout.fragment_customer_item, R.id.CustomerName, DB.getCustomersNames()));
     }
 
@@ -53,8 +53,8 @@ public class NewOrderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_order);
         setTitle("Добавление нового заказа");
         productsListView = (ListView) findViewById(R.id.products_list);
-        productsListView.addHeaderView(getLayoutInflater().inflate(R.layout.header_for_new_order, null));
-        productsListView.addFooterView(getLayoutInflater().inflate(R.layout.footer_for_new_order, null));
+        productsListView.addHeaderView(getLayoutInflater().inflate(R.layout.header_for_new_order, productsListView, false));
+        productsListView.addFooterView(getLayoutInflater().inflate(R.layout.footer_for_new_order, productsListView, false));
 
         productInLoading = ((ProgressBar) findViewById(R.id.product_in_loading));
         forCode = ((EditText) findViewById(R.id.product_code_edit));
@@ -113,10 +113,12 @@ public class NewOrderActivity extends AppCompatActivity {
                                 productsAdapter.remove(position - productsListView.getHeaderViewsCount());
                                 return true;
                             case R.id.details_product:
-                                Toast.makeText(getApplicationContext(), "Не реализовано", Toast.LENGTH_LONG)
-                                        .show();
+                                Intent intent = new Intent(NewOrderActivity.this, ProductDetails.class);
+                                intent.putExtra(Product.TABLE_NAME, productsAdapter.getProduct(position - productsListView.getHeaderViewsCount()).getOriflameId());
+                                startActivity(intent);
                                 return true;
                             default:
+                                showToast("Неизвестный пункт меню");
                                 return false;
                         }
                     }
@@ -131,14 +133,25 @@ public class NewOrderActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        customerChooser.setText(data.getStringExtra(Customer.ColumnInfo.NAME.getName()));
+        if (data != null)
+            customerChooser.setText(data.getStringExtra(Customer.ColumnInfo.NAME.getName()));
     }
 
     private class AddProductListener implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            if (productInLoading.getVisibility() == View.GONE)
-                new GetProduct().execute(Integer.parseInt(forCode.getText().toString()));
+            if (productInLoading.getVisibility() == View.GONE) {
+                String codeAsString = forCode.getText().toString();
+                int code;
+                try {
+                    code = Integer.parseInt(codeAsString);
+                } catch (NumberFormatException ex){
+                    Toast.makeText(getApplicationContext(), "Введите артикул", Toast.LENGTH_LONG)
+                            .show();
+                    return;
+                }
+                new GetProduct().execute(code);
+            }
         }
         private class GetProduct extends AsyncTask<Integer, Void, InfoBox>{
             @Override
@@ -148,13 +161,14 @@ public class NewOrderActivity extends AppCompatActivity {
 
             @Override
             protected InfoBox doInBackground(Integer... params) {
-                return OriflameProductFactory.getProduct(params[0]);
+                return OriflameProductFactory.getProductBox(params[0]);
             }
             @Override
             protected void onPostExecute(InfoBox fromSite) {
                 productInLoading.setVisibility(ProgressBar.GONE);
                 if (!fromSite.isSuccess()){
-                    Toast.makeText(getApplicationContext(), fromSite.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), fromSite.getMessage(), Toast.LENGTH_LONG)
+                            .show();
                 } else {
                     Log.i("Продукт получен!!))", new Gson()
                             .toJson(fromSite));

@@ -1,11 +1,9 @@
 package ru.cap.oriflameassistant.Adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
@@ -15,9 +13,6 @@ import java.util.List;
 import ru.cap.oriflameassistant.Model.Product;
 import ru.cap.oriflameassistant.ProductItem;
 
-/**
- * Created by Maksim on 11.06.2016.
- */
 public class ProductsAdapter extends BaseAdapter {
 
     private ArrayList<Product> array;
@@ -76,5 +71,9 @@ public class ProductsAdapter extends BaseAdapter {
     public void remove(int position) {
         array.remove(position);
         notifyDataSetChanged();
+    }
+
+    public Product getProduct(int position) {
+        return array.get(position);
     }
 }

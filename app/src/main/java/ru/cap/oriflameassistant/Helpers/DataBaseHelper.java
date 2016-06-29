@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -37,10 +36,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.execSQL(Order.forCreateTable());
         db.execSQL(Product.forCreateTable());
         db.execSQL(OrderToProducts.forCreateTable());
-        db.execSQL("INSERT INTO " + Order.TABLE_NAME + " (" +
-                Order.ColumnInfo.CUSTOMER.getName() + ", " +
-                Order.ColumnInfo.DATE.getName() + ") VALUES (9800, 'LOl2!WCW')");
-        addSomeProducts(db);
+        addEmptyModels(db);
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -54,15 +50,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
 
 
-    private void addSomeProducts(SQLiteDatabase db) {
-        for (int i = 0; i < 10; i++) {
-            ContentValues vals = new ContentValues();
-            vals.put(Product.ColumnInfo.NAME.getName(), "Щеточка номер " + i);
-            vals.put(Product.ColumnInfo.DESCRIPTION.getName(), "Описание щеточки номер " + i + " :)");
-            vals.put(Product.ColumnInfo.PRICE.getName(), 650.8);
-            db.insert(Product.TABLE_NAME, null, vals);
-            Log.i("Дополнение продуктов", "" + i);
-        }
+    private void addEmptyModels(SQLiteDatabase db) {
+        ContentValues vals = new ContentValues();
+        vals.put(Product.ColumnInfo.PRICE.getName(), 0);
+        vals.put(Product.ColumnInfo.NAME.getName(), "Неизвестный продукт");
+        vals.put(Product.ColumnInfo.DESCRIPTION.getName(), "Описание продукта, длнное-длинное");
+        vals.put(Product.ColumnInfo.ORIFLAME_ID.getName(), 0);
+        db.insert(Product.TABLE_NAME, null, vals);
     }
     public void addCustomer(Customer customer) {
         SQLiteDatabase db = getWritableDatabase();
@@ -187,7 +181,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + Order.TABLE_NAME, null);
         orders = new Order[cursor.getCount()];
-        int i = 0;
+        int i = cursor.getCount();
         while (cursor.moveToNext()) {
             Order order = new Order();
             order.setId(cursor.getLong(Order.ColumnInfo.ID.getIndex()));
@@ -195,7 +189,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             order.setProductList(getProductsForOrder(order.getId()));
             order.setCustomer(getCustomerWithId(order.getCustomerId()));
             order.setDate(cursor.getLong(Order.ColumnInfo.DATE.getIndex()));
-            orders[i++] = order;
+            orders[--i] = order;
         }
         cursor.close();
         db.close();
@@ -238,17 +232,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         int i = 0;
         while (cursor.moveToNext()) {
             products[i++] = Product.createFromCursor(cursor);
-            Log.d("Продукты", products[i - 1].getName());
         }
         cursor.close();
         db.close();
         return products;
     }
-
-
-
-
-
     public Product getProductWithCode(int productCode) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + Product.TABLE_NAME +" WHERE "+ Product.ColumnInfo.ORIFLAME_ID.getName() +" = "+productCode, null);

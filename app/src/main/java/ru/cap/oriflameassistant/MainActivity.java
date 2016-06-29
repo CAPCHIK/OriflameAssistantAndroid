@@ -1,26 +1,20 @@
 package ru.cap.oriflameassistant;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Menu;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import ru.cap.oriflameassistant.Adapters.OrdersAdapter;
 import ru.cap.oriflameassistant.Helpers.DataBaseHelper;
 import ru.cap.oriflameassistant.Helpers.OriflameProductFactory;
-import ru.cap.oriflameassistant.Model.Customer;
 import ru.cap.oriflameassistant.Model.Order;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
     DataBaseHelper sqlHelper;
     DataBaseHelper db;
+
+    FloatingActionButton fab;
 
     @Override
     protected void onResume() {
@@ -53,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Список заказов");
         sqlHelper = new DataBaseHelper(getApplicationContext());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -60,8 +57,7 @@ public class MainActivity extends AppCompatActivity {
         db.printOrderToProduct();
         db.printOrders();
         OriflameProductFactory.init(db);
-        Customer[] cs = sqlHelper.getCustomersFromBase(false);
-        FloatingActionButton fab = ((FloatingActionButton) findViewById(R.id.fab));
+        fab = ((FloatingActionButton) findViewById(R.id.fab));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,6 +82,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+        menu.findItem(R.id.action_settings).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Toast.makeText(getApplicationContext(), "Не реализовано", Toast.LENGTH_LONG)
+                        .show();
+                return true;
+            }
+        });
         return true;
     }
     private void updateData() throws Exception {
@@ -100,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Intent intent = new Intent(MainActivity.this, OrderInfo.class);
-            Log.i("MainActivity", "position = " + position + " id = " + id);
             intent.putExtra(Order.ColumnInfo.ID.getName(), id);
             startActivity(intent);
         }

@@ -19,7 +19,7 @@ public class NewCustomer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_customer);
-
+        setTitle("Новый заказчик");
         submitButton = ((Button) findViewById(R.id.new_customer_submit_button));
         customerNameET = (EditText) findViewById(R.id.new_customer_customer_name);
         customerNumberET = (EditText) findViewById(R.id.new_customer_customer_number);
